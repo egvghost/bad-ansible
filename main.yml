@@ -72,6 +72,11 @@
       path: /usr/share/tomcat/webapps/ROOT
       state: directory
 
+  - name: create tomcat/webapps/ansible directory
+    file:
+      path: /usr/share/tomcat/webapps/ansible
+      state: directory
+
   - name: copy static index.html to tomcat webapps/ansible/index.html
     template:
       src: index.html.j2
@@ -89,6 +94,11 @@
   become: true
 
   tasks:
+  - name: create tomcat/webapps/ansible directory
+    file:
+      path: /usr/share/tomcat/webapps/ansible
+      state: directory
+
   - name: copy static index.html to tomcat webapps/ansible/index.html
     template:
       src: index.html.app1
@@ -100,35 +110,47 @@
   become: true
 
   tasks:
+  - name: create tomcat/webapps/ansible directory
+    file:
+      path: /usr/share/tomcat/webapps/ansible
+      state: directory
+
   - name: copy static index.html to tomcat webapps/ansible/index.html
     template:
       src: index.html.app2
       dest: /usr/share/tomcat/webapps/ansible/index.html
 
 - name: deploy postgres
-  hosts: apps
+  #hosts: apps
   gather_facts: false
   become: true
   hosts: appdbs
   tasks:
-  - name: install progress
-    command: "yum install -y postgresql-server"
+#  - name: install progress
+#    command: "yum install -y postgresql-server"
 
-  #- name: install postgres
-  #  yum:
-  #    name: postgresql-server
-  #    state: latest
+  - name: install postgres
+    yum:
+      name: postgresql-server
+      state: latest
   - name: enable apache at boot
     service:
       name: postgresql
       enabled: yes
-  - name: tell user to finish setting up postgres
-    debug:
-      msg: "Either uncomment the postgres setup or manually login and initialize"
+#  - name: tell user to finish setting up postgres
+#    debug:
+#      msg: "Either uncomment the postgres setup or manually login and initialize"
 
  # only run the next 2 tasks once!
-#  - name: initilize postgres
-#    command: postgresql-setup initdb
+  - name: Check for initdb.log
+    stat:
+      path: /var/lib/pgsql/initdb.log
+    register: r_check_initdb_log
+
+  - name: initilize postgres
+    command: postgresql-setup initdb
+    when: not r_check_initdb_log.stat.exists
+
 #  - name: initilize postgres some more
 #    command: chkconfig postgresql on
   - name: start postgres
@@ -137,7 +159,7 @@
       state: started
 
 - name: deploy apache
-  hosts: apps
+  #hosts: apps
   gather_facts: false
   become: true
   hosts: apps
