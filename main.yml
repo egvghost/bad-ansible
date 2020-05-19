@@ -17,76 +17,22 @@
   hosts: all
   gather_facts: false # remove later! speeds up testing
   become: true
-
-  tasks:
-  - name: enable repos
-    template:
-      src: ./open_three-tier-app.repo
-      dest: /etc/yum.repos.d/open_three-tier-app.repo
-      mode: 0644
+  roles:
+  - three_tier_common
 
 - name: deploy haproxy
   hosts: frontends
   gather_facts: false # remove later! speeds up testing
   become: true
-
-  tasks:
-  - name: http
-    package:
-      name: httpie
-      state: latest
-  - name: install HAProxy
-    yum:
-      name=haproxy state=latest
-  - name: enable HAProxy
-    service:
-      name: haproxy
-      state: started
-  - name: configure haproxy
-    template:
-      src: ./haproxy.cfg.j2
-      dest: /etc/haproxy/haproxy.cfg
-  - name: restart HAproxy
-    service:
-      name: haproxy
-      state: restarted
-
+  roles:
+  - three_tier_frontend
 
 - name: deploy tomcat
   hosts: apps
   gather_facts: false
   become: true
-
-  tasks:
-  - name: install tomcat
-    package:
-      name: tomcat
-      state: latest
-  - name: enable tomcat at boot
-    service:
-      name: tomcat
-      enabled: yes
-
-  - name: create ansible tomcat directory
-    file:
-      path: /usr/share/tomcat/webapps/ROOT
-      state: directory
-
-  - name: create tomcat/webapps/ansible directory
-    file:
-      path: /usr/share/tomcat/webapps/ansible
-      state: directory
-
-  - name: copy static index.html to tomcat webapps/ansible/index.html
-    template:
-      src: index.html.j2
-      dest: /usr/share/tomcat/webapps/ROOT/index.html
-      mode: 0644
-
-  - name: start tomcat
-    service:
-      name: tomcat
-      state: started
+  roles:
+  -  three_tier_apps
 
 - name: index.html on app 1
   hosts: app1
