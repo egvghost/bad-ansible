@@ -14,8 +14,8 @@
 #   No use of handlers
 
 - name: configuration
-  hosts: all
-  gather_facts: false # remove later! speeds up testing
+  hosts: apps:frontends:appdbs
+  gather_facts: true
   become: true
   roles:
   - three_tier_common
