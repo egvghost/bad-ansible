@@ -8,11 +8,14 @@
     name: tomcat
     enabled: yes
 
-- name: create ansible tomcat directories
+- name: create ansible tomcat directory
   file:
-    path: 
-    - /usr/share/tomcat/webapps/ROOT
-    - /usr/share/tomcat/webapps/ansible
+    path: /usr/share/tomcat/webapps/ROOT
+    state: directory
+
+- name: create ansible tomcat directory
+  file:
+    path: /var/lib/tomcat/webapps/ansible
     state: directory
 
 - name: copy static index.html to tomcat webapps/ROOT/index.html
