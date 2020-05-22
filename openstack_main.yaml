@@ -4,12 +4,12 @@
   gather_facts: false
   tasks:
   - name: Get openstack servers
-    os_server_facts:
+    os_server_info:
       cloud: openstack
     register: r_os_server_info
-  - name: show servers info
-    debug:
-      var: r_os_server_info
+#  - name: show servers info
+#    debug:
+#      var: r_os_server_info.openstack_servers
   - name: Start servers
     os_server_action:
       action: start
