@@ -7,6 +7,9 @@
     os_server_facts:
       cloud: openstack
     register: r_os_server_info
+  - name: show servers info
+    debug:
+      var: r_os_server_info
   - name: Start servers
     os_server_action:
       action: start
